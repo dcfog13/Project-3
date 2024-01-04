@@ -10,7 +10,7 @@ function init() {
     for (let i=0; i < yearList.length; i++) {
         yearDropdown.append("option").text(yearList[i]);
     };
-    // Call plotting functions
+    // Initialize functions with default entries
     getInfo('(all)','2018-2023');
     barChart('(all)','2018-2023');
 
@@ -18,49 +18,199 @@ function init() {
 
 function getInfo(state,year) {
     d3.json("clinical.json").then((data)=> {
+        // Log json
+        console.log(data);
+        // Set total case variables
         let totalCases = 0;
         let totalA = 0;
         let totalB = 0;
+        // Logic for state/year selections
         if (state === '(all)') {
             if (year === '2018-2023') {
+                // All states, all years
                 for (let i=0; i < data.length; i++) {
                     totalCases += data[i].total_specimens;
                     totalA += data[i].total_a;
                     totalB += data[i].total_b;
                 };
             } else {
-
+                // All states, one year
+                for (let i=0; i < data.length; i++) {
+                    if (data[i].year === parseInt(year)) {
+                        totalCases += data[i].total_specimens;
+                        totalA += data[i].total_a;
+                        totalB += data[i].total_b;
+                    };
+                };
             };
         } else {
             if (year === '2018-2023') {
-
+                // One state, all years
+                for (let i=0; i < data.length; i++) {
+                    if (data[i].region === state) {
+                        totalCases += data[i].total_specimens;
+                        totalA += data[i].total_a;
+                        totalB += data[i].total_b;
+                    };
+                };
             } else {
-
+                // One state, one year
+                for (let i=0; i < data.length; i++) {
+                    if (data[i].region === state) {
+                        if (data[i].year === parseInt(year)) {
+                            totalCases += data[i].total_specimens;
+                            totalA += data[i].total_a;
+                            totalB += data[i].total_b;
+                        };
+                    };
+                };
             };
         };
+        console.log(state);
+        console.log(year);
+        // Reset overview panel
         let Info = d3.select("#sample-metadata");
         Info.html("");
-        Object.entries(totalCases).forEach((key) => {   
-            Info.append("h5").text(key[0] + ": " + key[1] + "\n");  
+        // Create key-value pair
+        let totalCasesKey = {};
+        totalCasesKey.Total = totalCases;
+        totalCasesKey.A = totalA;
+        totalCasesKey.B = totalB;
+        // Write to overview panel
+        Object.entries(totalCasesKey).forEach((key) => {   
+            Info.append("h5").text("Confirmed " + key[0] + " Cases: " + key[1] + "\n");  
         });
     });
 }
 
 function barChart(state,year) {
     d3.json("clinical.json").then((data)=> {
-        console.log(data);
-
+        // Declare arrays to hold bar chart data
+        let weeks = [];
+        let casesOverall = [];
+        let casesA = [];
+        let casesB = [];
+        // Logic for state/year selections
+        if (state === '(all)') {
+            // Declare temp counters to total all states data
+            let casesOverallCounter = 0;
+            let casesACounter = 0;
+            let casesBCounter = 0;
+            if (year === '2018-2023') {
+                // All states, all years
+                let yearMarker = 2018;
+                for (let i=0; i < data.length; i++) {
+                    if (data[i].week === 1 && data[i].region === 'Alabama') {
+                        yearMarker += 1;
+                    };
+                    casesOverallCounter += data[i].total_specimens;
+                    casesACounter += data[i].total_a;
+                    casesBCounter += data[i].total_b;
+                    if (i === data.length-1) {
+                        weeks.push(data[i].week.toString() + "-" + yearMarker.toString());
+                        casesOverall.push(casesOverallCounter);
+                        casesA.push(casesACounter);
+                        casesB.push(casesBCounter);
+                        casesOverallCounter = 0;
+                        casesACounter = 0;
+                        casesBCounter = 0;
+                    } else if (data[i+1].week != data[i].week) {
+                        weeks.push(data[i].week.toString() + "-" + yearMarker.toString());
+                        casesOverall.push(casesOverallCounter);
+                        casesA.push(casesACounter);
+                        casesB.push(casesBCounter);
+                        casesOverallCounter = 0;
+                        casesACounter = 0;
+                        casesBCounter = 0;
+                    };
+                };
+            } else {
+                // All states, one year
+                for (let i=0; i < data.length; i++) {
+                    casesOverallCounter += data[i].total_specimens;
+                    casesACounter += data[i].total_a;
+                    casesBCounter += data[i].total_b;
+                    if (i === data.length-1) {
+                        weeks.push(data[i].week.toString());
+                        casesOverall.push(casesOverallCounter);
+                        casesA.push(casesACounter);
+                        casesB.push(casesBCounter);
+                        casesOverallCounter = 0;
+                        casesACounter = 0;
+                        casesBCounter = 0;
+                    } else if (data[i+1].week != data[i].week) {
+                        weeks.push(data[i].week.toString());
+                        casesOverall.push(casesOverallCounter);
+                        casesA.push(casesACounter);
+                        casesB.push(casesBCounter);
+                        casesOverallCounter = 0;
+                        casesACounter = 0;
+                        casesBCounter = 0;
+                    };
+                };
+            };
+        } else {
+            if (year === '2018-2023') {
+                // One state, all years
+                let yearMarker = 2018;
+                for (let i=0; i < data.length; i++) {
+                    if (data[i].region === state) {
+                        if (data[i].week === 1) {
+                            yearMarker += 1;
+                        };
+                        weeks.push(data[i].week.toString() + "-" + yearMarker.toString());
+                        casesOverall.push(data[i].total_specimens);
+                        casesA.push(data[i].total_a);
+                        casesB.push(data[i].total_b);
+                    };
+                };
+            } else {
+                // One state, one year
+                for (let i=0; i < data.length; i++) {
+                    if (data[i].region === state) {
+                        if (data[i].year === parseInt(year)) {
+                            weeks.push(data[i].week.toString());
+                            casesOverall.push(data[i].total_specimens);
+                            casesA.push(data[i].total_a);
+                            casesB.push(data[i].total_b);
+                        };
+                    };
+                };
+            };
+        };
+        console.log(casesA);
+        console.log(casesB);
+        // Create traces for both A and B variants
+        let trace1 = {
+            x: weeks,
+            y: casesA,
+            name: 'Confirmed A Cases',
+            type: 'bar'
+        };
+        let trace2 = {
+            x: weeks,
+            y: casesB,
+            name: 'Confirmed B Cases',
+            type: 'bar'
+        };
+        let barData = [trace1, trace2];
+        let layout = {
+            title: 'Confirmed Weekly A and B Cases',
+            barmode: 'stack'
+        };
+        // Create plot
+        Plotly.newPlot('bar',barData,layout);
     });
 };
 
 
-
-
-
 function optionChanged(state,year) {
-    // Change demographic data and plots on state or year change
+    // Change data and plots on state or year change
+    year = '2018-2023';
     getInfo(state,year);
-    barPlot(state,year);
+    barChart(state,year);
+
 };
+
 
 init();
