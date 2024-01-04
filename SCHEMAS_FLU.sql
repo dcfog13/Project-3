@@ -31,6 +31,11 @@ ALTER TABLE clinical
 	ALTER COLUMN percent_b TYPE FLOAT USING percent_b::float;
 	
 SELECT * FROM clinical WHERE total_specimens = 0
+
+COPY (
+	SELECT json_agg(row_to_json(clinical))
+	FROM clinical
+	) TO 'C:\Users\Corey\Desktop\Project-3\clinical.json';
 	
 CREATE TABLE public_health (
 	region_type VARCHAR(255) NOT NULL,
@@ -71,6 +76,11 @@ ALTER TABLE public_health
 	
 SELECT * FROM public_health WHERE total_specimens = 0
 
+COPY (
+	SELECT json_agg(row_to_json(public_health))
+	FROM public_health
+	) TO 'C:\Users\Corey\Desktop\Project-3\public_health.json';
+
 CREATE TABLE ili (
 	region_type VARCHAR(255) NOT NULL,
 	region VARCHAR (255) NOT NULL,
@@ -100,7 +110,11 @@ ALTER TABLE ili
 SELECT * FROM ili WHERE percent_unweighted = 0
 
 COPY (
-	SELECT json_agg(row_to_json(clinical))
-	FROM clinical
-	) TO 'C:\Users\Public\project_3_table_jsons'
+	SELECT json_agg(row_to_json(ili))
+	FROM ili
+	) TO 'C:\Users\Corey\Desktop\Project-3\ili.json';
+
+
+	
+
 	
