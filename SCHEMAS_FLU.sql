@@ -1,49 +1,70 @@
-Create table Clinical (
+CREATE TABLE clinical (
 	region_type VARCHAR(255) NOT NULL,
 	region VARCHAR (255) NOT NULL,
-	YEAR INT NOT NULL,
-	WEEK INT NOT NULL,
-	TOTAL_SPECIMENS VARCHAR (255),
-	TOTAL_A VARCHAR (255),
-	TOTAL_B VARCHAR (255),
-	PERCENT_POSITVE VARCHAR (255),
-	PERCENT_A VARCHAR (255),
-	PERCENT_B VARCHAR (255)
+	year INT NOT NULL,
+	week INT NOT NULL,
+	total_specimens VARCHAR (255) NOT NULL,
+	total_a VARCHAR (255) NOT NULL,
+	total_b VARCHAR (255) NOT NULL,
+	percent_positive VARCHAR (255) NOT NULL,
+	percent_a VARCHAR (255) NOT NULL,
+	percent_b VARCHAR (255) NOT NULL
 	);
-	SELECT * FROM CLINICAL
 	
-Create table PUBLIC_HEALTH (
-	REGION_TYPE VARCHAR(255) NOT NULL,
-	REGION VARCHAR (255) NOT NULL,
-	SEASON_DESCRIPTION VARCHAR (255) NOT NULL,
-	TOTAL_SPECIMENS VARCHAR (255),
-	A_H1N1 VARCHAR (255),
-	A_H3 VARCHAR (255),
-	A_NO_SUBTYPE VARCHAR (255),
-	B VARCHAR (255),
-	BVic VARCHAR (255),
-	BYam VARCHAR (255),
-	H3n2v VARCHAR (255)
+SELECT * FROM clinical;
+	
+UPDATE clinical
+	SET total_specimens = '0', 
+		total_a = '0', 
+		total_b = '0', 
+		percent_positive = '0', 
+		percent_a = '0', 
+		percent_b = '0'
+	WHERE total_specimens = 'X';
+	
+ALTER TABLE clinical
+	ALTER COLUMN total_specimens TYPE INT USING total_specimens::integer,
+	ALTER COLUMN total_a TYPE INT USING total_a::integer,
+	ALTER COLUMN total_b TYPE INT USING total_b::integer,
+	ALTER COLUMN percent_positive TYPE FLOAT USING percent_positive::float,
+	ALTER COLUMN percent_a TYPE FLOAT USING percent_a::float,
+	ALTER COLUMN percent_b TYPE FLOAT USING percent_b::float;
+	
+SELECT * FROM clinical WHERE total_specimens = 0
+	
+CREATE TABLE public_health (
+	region_type VARCHAR(255) NOT NULL,
+	region VARCHAR (255) NOT NULL,
+	season_description VARCHAR (255) NOT NULL,
+	total_specimens VARCHAR (255),
+	a_h1n1 VARCHAR (255),
+	a_h3 VARCHAR (255),
+	a_no_subtype VARCHAR (255),
+	b VARCHAR (255),
+	bvic VARCHAR (255),
+	byam VARCHAR (255),
+	h3n2v VARCHAR (255)
 	);
-	SELECT * FROM PUBLIC_HEALTH	
 
-Create table ILI (
+SELECT * FROM public_health	
+
+Create table ili (
 	region_type VARCHAR(255) NOT NULL,
 	region VARCHAR (255) NOT NULL,
-	YEAR INT NOT NULL,
-	WEEK INT NOT NULL,
-	PERCENT_WEIGHTED VARCHAR (255),
-	PERCENT_UNWEIGHTED VARCHAR (255),
-	AGE_0_4 VARCHAR (255),
-	AGE_25_49 VARCHAR (255),
-	AGE_25_64 VARCHAR (255),
-	AGE_5_24 VARCHAR (255),
-	AGE_50_64 VARCHAR (255),
-	AGE_65 VARCHAR (255),
-	ILITOTAL VARCHAR (255),
-	NUM_OF_PROVIDERS VARCHAR (255),
-	TOTAL_PATIENTS VARCHAR (255)
+	year INT NOT NULL,
+	week INT NOT NULL,
+	percent_weighted VARCHAR (255),
+	percent_unweighted VARCHAR (255),
+	age_0_4 VARCHAR (255),
+	age_25_49 VARCHAR (255),
+	age_25_64 VARCHAR (255),
+	age_5_24 VARCHAR (255),
+	age_50_64 VARCHAR (255),
+	age_65 VARCHAR (255),
+	ilitotal VARCHAR (255),
+	num_of_providers VARCHAR (255),
+	total_patients VARCHAR (255)
 	);
 	
-	SELECT * FROM ILI
+SELECT * FROM ili
 	
