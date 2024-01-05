@@ -13,6 +13,7 @@ function init() {
     // Initialize functions with default entries
     getInfo('(all)','2018-2023');
     barChart('(all)','2018-2023');
+    pieChart('(all)','2018-2023')
 
 };
 
@@ -203,6 +204,125 @@ function barChart(state,year) {
     });
 };
 
+// Corey
+function pieChart(state,year) {
+    d3.json("clinical.json").then((data)=> {
+        // Declare arrays to hold bar chart data
+        let weeks = [];
+        let casesOverall = [];
+        let percA = [];
+        let percB = [];
+        // Logic for state/year selections
+        if (state === '(all)') {
+            // Declare temp counters to total all states data
+            let casesOverallCounter = 0;
+            let percACounter = 0;
+            let percBCounter = 0;
+            if (year === '2018-2023') {
+                // All states, all years
+                let yearMarker = 2018;
+                for (let i=0; i < data.length; i++) {
+                    if (data[i].week === 1 && data[i].region === 'Alabama') {
+                        yearMarker += 1;
+                    };
+                    casesOverallCounter += data[i].total_specimens;
+                    percACounter += data[i].percent_a;
+                    percBCounter += data[i].percent_b;
+                    if (i === data.length-1) {
+                        weeks.push(data[i].week.toString() + "-" + yearMarker.toString());
+                        casesOverall.push(casesOverallCounter);
+                        percA.push(percACounter);
+                        percB.push(percBCounter);
+                        casesOverallCounter = 0;
+                        percACounter = 0;
+                        percBCounter = 0;
+                    } else if (data[i+1].week != data[i].week) {
+                        weeks.push(data[i].week.toString() + "-" + yearMarker.toString());
+                        casesOverall.push(casesOverallCounter);
+                        percA.push(percACounter);
+                        percB.push(percBCounter);
+                        casesOverallCounter = 0;
+                        percACounter = 0;
+                        percBCounter = 0;
+                    };
+                };
+            } else {
+                // All states, one year
+                for (let i=0; i < data.length; i++) {
+                    casesOverallCounter += data[i].total_specimens;
+                    percACounter += data[i].percent_a;
+                    percBCounter += data[i].percent_b;
+                    if (i === data.length-1) {
+                        weeks.push(data[i].week.toString());
+                        casesOverall.push(casesOverallCounter);
+                        percA.push(percACounter);
+                        percB.push(percBCounter);
+                        casesOverallCounter = 0;
+                        percACounter = 0;
+                        percBCounter = 0;
+                    } else if (data[i+1].week != data[i].week) {
+                        weeks.push(data[i].week.toString());
+                        casesOverall.push(casesOverallCounter);
+                        percA.push(percACounter);
+                        percB.push(percBCounter);
+                        casesOverallCounter = 0;
+                        percACounter = 0;
+                        percBCounter = 0;
+                    };
+                };
+            };
+        } else {
+            if (year === '2018-2023') {
+                // One state, all years
+                let yearMarker = 2018;
+                for (let i=0; i < data.length; i++) {
+                    if (data[i].region === state) {
+                        if (data[i].week === 1) {
+                            yearMarker += 1;
+                        };
+                        weeks.push(data[i].week.toString() + "-" + yearMarker.toString());
+                        casesOverall.push(data[i].total_specimens);
+                        percA.push(data[i].percent_a);
+                        percB.push(data[i].percent_b);
+                    };
+                };
+            } else {
+                // One state, one year
+                for (let i=0; i < data.length; i++) {
+                    if (data[i].region === state) {
+                        if (data[i].year === parseInt(year)) {
+                            weeks.push(data[i].week.toString());
+                            casesOverall.push(data[i].total_specimens);
+                            percA.push(data[i].perc_a);
+                            percB.push(data[i].perc_b);
+                        };
+                    };
+                };
+            };
+        };
+        console.log(percA);
+        console.log(percB);
+        // Create traces for both A and B variants
+        let trace1 = {
+            labels: regions,
+            values: percA,
+            name: 'Percent A Cases',
+            type: 'pie'
+        };
+        let trace2 = {
+            labels: regions,
+            values: percB,
+            name: 'Percent B Cases',
+            type: 'pie'
+        };
+        let pieData = [trace1, trace2];
+        let layout = {
+            title: 'Percent A and B Cases',
+        };
+        // Create plot
+        Plotly.newPlot('pie',pieData,layout);
+    });
+};
 
 function optionChanged(state,year) {
     // Change data and plots on state or year change
