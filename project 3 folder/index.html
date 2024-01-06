@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Include necessary meta tags, title, and CSS (Bootstrap) -->
+</head>
+
+<body>
+  <!-- HTML structure with div elements for dropdowns and charts -->
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3">
+        <h5>State/Territory:</h5>
+        <select id="selstateDataset" onchange="optionChanged()"></select>
+        <h5>Year:</h5>
+        <select id="selyearDataset" onchange="optionChanged()"></select>
+      </div>
+      <div class="col-md-9">
+        <div id="bubble"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include necessary scripts (d3.js, Plotly.js, and your app.js) -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="./static/js/app.js"></script>
+  <script>
+    const url = "clinical.json";
+
+    // Function to initialize dropdowns and dashboard
+    function initializeDashboard() {
+      let stateDropdown = d3.select("#selstateDataset");
+      let yearDropdown = d3.select("#selyearDataset");
+
+      // Load data and populate dropdowns
+      d3.json(url).then((data) => {
+        let states = [...new Set(data.map(entry => entry.region))];
+        let years = [...new Set(data.map(entry => entry.year))];
+
+        states.forEach(state => stateDropdown.append("option").text(state));
+        years.forEach(year => yearDropdown.append("option").text(year));
+
+        // Call functions with default entries
+        optionChanged();
+      });
+    }
+
+    // Function to update bubble chart based on dropdown selections
+    function optionChanged() {
+      let selectedState = d3.select("#selstateDataset").property("value");
+      let selectedYear = parseInt(d3.select("#selyearDataset").property("value"));
+
+      d3.json(url).then((data) => {
+        let filteredData = data.filter(entry => {
+          return (entry.region === selectedState || selectedState === "All") &&
+            (entry.year === selectedYear || selectedYear === 0);
+        });
+
+        // Create bubble chart data
+        let bubbleData = {
+          x: filteredData.map(entry => entry.total_specimens),
+          y: filteredData.map(entry => entry.percent_positive),
+          text: filteredData.map(entry => `${entry.region}, ${entry.year}, Week ${entry.week}`),
+          mode: 'markers',
+          marker: {
+            size: filteredData.map(entry => entry.total_a + entry.total_b),
+            color: filteredData.map(entry => entry.total_a),
+            colorscale: 'Viridis',
+            opacity: 0.5,
+          }
+        };
+
+        // Layout for the bubble chart
+        let layout = {
+          title: 'Flu Data Bubble Chart',
+          xaxis: { title: 'Total Specimens' },
+          yaxis: { title: 'Percent Positive' }
+        };
+
+        // Plot bubble chart
+        Plotly.newPlot('bubble', [bubbleData], layout);
+      });
+    }
+
+    // Call initializeDashboard function when the page loads
+    initializeDashboard();
+  </script>
+</body>
+
+</html>
