@@ -1,2 +1,8 @@
 # Project-3
 Data Visualization Project
+
+The goal of this project was to take existing CDC influenza data from their own dashboard, and clean and adapt it into a more user-friendly format with less extraneous information. This data represents a 5-year period between late 2018 and late 2023, and contains data from clinical labs as well as public health labs. The original CDC csv files have significant portions of data missing, especially during the COVID-19 pandemic, as well as various minor formatting issues. These tables were imported into PostgreSQL and cleaned and reformatted into json files; both the original csv and cleaned json files are available in this repository. These json files were then used to create our dashboard in JavaScript. The final dashboard allows users to filter by state and by year, and contains a brief summary of total cases, a stacked bar chart by week, pie charts for different flu variants recorded by clinical and public health labs, and a bubble plot representing flu positivity rates vs. total confirmed flu cases for each week.
+
+The dashboard requires app.js, index.html, and the clinical and public health json files. The user can filter the data using the two dropdown menus on the left side, filtering by individual state or by all states, and either by year or over the entire 5-year period. The plots are interactable and will adapt to the user's selections automatically.
+
+This data was obtained from https://gis.cdc.gov/grasp/fluview/fluportaldashboard.html using their built-in download features, and is publically available. These datasets contain no sensitive or personal information.
